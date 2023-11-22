@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Botón Cambia Color</title>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* Estilo inicial del botón */
+        #miBoton {
+            background-color: red;
+            padding: 50px; /* Aumenté el tamaño del botón */
+            cursor: pointer;
+            border: none;
+            color: white;
+            font-size: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Botón en HTML con un identificador único -->
+    <button id="miBoton">Activar LED</button>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.3/firebase-app.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.6.3/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCTrC4A366Hd5orf0lHPpiFikXolNyORps",
+            authDomain: "iotproject-ac742.firebaseapp.com",
+            databaseURL: "https://iotproject-ac742-default-rtdb.firebaseio.com",
+            projectId: "iotproject-ac742",
+            storageBucket: "iotproject-ac742.appspot.com",
+            messagingSenderId: "368660847824",
+            appId: "1:368660847824:web:bd407d03de28bb12f412d5",
+            measurementId: "G-ST6VCQ0TY8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const miBoton = document.getElementById('miBoton');
+
+        miBoton.addEventListener('click', () => {
+            // Cambia el color de fondo del botón al rojo si no está presionado, y al verde si está presionado
+            const nuevoColor = miBoton.style.backgroundColor === 'red' ? 'green' : 'red';
+            miBoton.style.backgroundColor = nuevoColor;
+
+            // Cambia el texto del botón según el estado del LED
+            miBoton.textContent = nuevoColor === 'red' ? 'Activar LED' : 'Desactivar LED';
+
+            // Envía un 0 a la base de datos si el botón es rojo, y un 1 si es verde
+            const valorAGuardar = nuevoColor === 'red' ? 0 : 1;
+
+            set(ref(db, 'estadoLED'), valorAGuardar)
+                .then(() => {
+                    console.log(`Valor ${valorAGuardar} guardado en la base de datos.`);
+                })
+                .catch((error) => {
+                    console.error(`Error al guardar el valor en la base de datos: ${error}`);
+                });
+        });
+    </script>
+
+</body>
+</html>
